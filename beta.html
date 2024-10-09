@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misterios por Resolver</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #e94560;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            color: #ffd700;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        #question, #hint, #result {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        #answer {
+            width: 80%;
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+        
+        #submit {
+            background-color: #e94560;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        
+        #submit:hover {
+            background-color: #d13550;
+        }
+        
+        #progress {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #ffd700;
+        }
+        
+        #copyright {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-style: italic;
+            font-size: 0.8em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Misterios por Resolver</h1>
+        <div id="question"></div>
+        <div id="hint"></div>
+        <input type="text" id="answer" placeholder="Tu respuesta aquí">
+        <button id="submit">Enviar</button>
+        <div id="result"></div>
+        <div id="progress"></div>
+    </div>
+    
+    <div id="copyright">© 2024 Juan José Cruz Sagarminaga</div>
+
+    <script>
+        const questions = [
+            {
+                question: "¿Quién escribió 'El Príncipe'?",
+                answer: "maquiavelo",
+                hints: [
+                    "Fue un diplomático, filósofo político y escritor italiano del Renacimiento.",
+                    "Su obra más famosa es considerada el primer trabajo del pensamiento político moderno.",
+                    "Su nombre comienza con 'M' y termina con 'o'."
+                ]
+            },
+            {
+                question: "¿Cuál es el río más largo del mundo?",
+                answer: "amazonas",
+                hints: [
+                    "Se encuentra en Sudamérica.",
+                    "Atraviesa la selva tropical más grande del planeta.",
+                    "Su nombre comienza con 'A'."
+                ]
+            },
+            {
+                question: "¿Quién pintó 'La noche estrellada'?",
+                answer: "van gogh",
+                hints: [
+                    "Fue un pintor postimpresionista neerlandés.",
+                    "Es famoso por cortarse una oreja.",
+                    "Su nombre de pila es Vincent."
+                ]
+            },
+            {
+                question: "¿En qué año llegó el hombre a la Luna?",
+                answer: "1969",
+                hints: [
+                    "Fue durante la década de 1960.",
+                    "Ocurrió en el último año de esa década.",
+                    "El año termina en '69'."
+                ]
+            },
+            {
+                question: "¿Cuál es el elemento químico más abundante en el universo?",
+                answer: "hidrogeno",
+                hints: [
+                    "Es el elemento más ligero.",
+                    "Su símbolo químico es 'H'.",
+                    "Es el principal componente de las estrellas."
+                ]
+            },
+            {
+                question: "¿Quién escribió '1984'?",
+                answer: "george orwell",
+                hints: [
+                    "Es un autor británico del siglo XX.",
+                    "También escribió 'Rebelión en la granja'.",
+                    "Su nombre real era Eric Arthur Blair."
+                ]
+            },
+            {
+                question: "¿Cuál es la capital de Japón?",
+                answer: "tokio",
+                hints: [
+                    "Es la ciudad más poblada del mundo.",
+                    "Fue sede de los Juegos Olímpicos en 1964 y 2020 (2021).",
+                    "Su nombre anterior era Edo."
+                ]
+            },
+            {
+                question: "¿Quién formuló la teoría de la relatividad?",
+                answer: "albert einstein",
+                hints: [
+                    "Fue un físico teórico alemán naturalizado estadounidense.",
+                    "Es famoso por la ecuación E=mc².",
+                    "Ganó el Premio Nobel de Física en 1921."
+                ]
+            },
+            {
+                question: "¿Cuál es el océano más grande?",
+                answer: "pacifico",
+                hints: [
+                    "Cubre aproximadamente el 30% de la superficie terrestre.",
+                    "Se encuentra entre América y Asia.",
+                    "Su nombre significa 'pacífico' o 'tranquilo'."
+                ]
+            },
+            {
+                question: "¿Quién escribió 'Romeo y Julieta'?",
+                answer: "william shakespeare",
+                hints: [
+                    "Es considerado el escritor más importante en lengua inglesa.",
+                    "Vivió durante la época isabelina en Inglaterra.",
+                    "También escribió 'Hamlet' y 'Macbeth'."
+                ]
+            },
+            {
+                question: "¿Cuál es la montaña más alta del mundo?",
+                answer: "everest",
+                hints: [
+                    "Se encuentra en la cordillera del Himalaya.",
+                    "Mide aproximadamente 8,848 metros sobre el nivel del mar.",
+                    "Su nombre en nepalí es Sagarmatha."
+                ]
+            },
+            {
+                question: "¿Quién pintó la Capilla Sixtina?",
+                answer: "miguel angel",
+                hints: [
+                    "Fue un artista renacentista italiano.",
+                    "También esculpió el David y la Piedad.",
+                    "Su nombre completo es Miguel Ángel Buonarroti."
+                ]
+            },
+            {
+                question: "¿Cuál es el país más grande del mundo por área?",
+                answer: "rusia",
+                hints: [
+                    "Se extiende por gran parte de Europa del Este y el norte de Asia.",
+                    "Su capital es Moscú.",
+                    "Tiene 11 zonas horarias."
+                ]
+            },
+            {
+                question: "¿Quién descubrió la penicilina?",
+                answer: "alexander fleming",
+                hints: [
+                    "Fue un científico escocés.",
+                    "Su descubrimiento fue accidental en 1928.",
+                    "Ganó el Premio Nobel de Fisiología o Medicina en 1945."
+                ]
+            },
+            {
+                question: "¿Cuál es el metal más abundante en la corteza terrestre?",
+                answer: "aluminio",
+                hints: [
+                    "Es un metal ligero y resistente a la corrosión.",
+                    "Se usa comúnmente en latas de bebidas.",
+                    "Su símbolo químico es 'Al'."
+                ]
+            },
+            {
+                question: "¿Quién pintó 'El grito'?",
+                answer: "edvard munch",
+                hints: [
+                    "Fue un pintor y grabador noruego.",
+                    "La obra muestra una figura angustiada contra un paisaje turbulento.",
+                    "Su nombre de pila es Edvard."
+                ]
+            },
+            {
+                question: "¿Cuál es la capital de Australia?",
+                answer: "canberra",
+                hints: [
+                    "No es Sydney ni Melbourne.",
+                    "Fue construida específicamente para ser la capital del país.",
+                    "Su nombre comienza con 'C'."
+                ]
+            },
+            {
+                question: "¿Quién escribió 'Cien años de soledad'?",
+                answer: "gabriel garcia marquez",
+                hints: [
+                    "Fue un escritor colombiano.",
+                    "Es uno de los máximos exponentes del realismo mágico.",
+                    "Ganó el Premio Nobel de Literatura en 1982."
+                ]
+            },
+            {
+                question: "¿Cuál es el planeta más cercano al Sol?",
+                answer: "mercurio",
+                hints: [
+                    "Es el planeta más pequeño del sistema solar.",
+                    "Tiene la órbita más rápida alrededor del Sol.",
+                    "Su nombre está asociado con el mensajero de los dioses romanos."
+                ]
+            },
+            {
+                question: "¿Quién inventó la bombilla eléctrica?",
+                answer: "thomas edison",
+                hints: [
+                    "Fue un inventor y empresario estadounidense.",
+                    "Fundó la compañía General Electric.",
+                    "Su nombre de pila es Thomas."
+                ]
+            },
+            {
+                question: "¿Cuál es el animal terrestre más grande?",
+                answer: "elefante africano",
+                hints: [
+                    "Es un mamífero que vive en África.",
+                    "Tiene grandes orejas y una trompa larga.",
+                    "Es más grande que su primo asiático."
+                ]
+            },
+            {
+                question: "¿Quién escribió 'La Odisea'?",
+                answer: "homero",
+                hints: [
+                    "Fue un poeta de la Antigua Grecia.",
+                    "También escribió 'La Ilíada'.",
+                    "Su nombre está asociado con una famosa serie de televisión animada."
+                ]
+            },
+            {
+                question: "¿Cuál es el río más largo de Europa?",
+                answer: "volga",
+                hints: [
+                    "Fluye enteramente por Rusia.",
+                    "Desemboca en el Mar Caspio.",
+                    "Su nombre comienza con 'V'."
+                ]
+            },
+            {
+                question: "¿Quién pintó 'Las meninas'?",
+                answer: "diego velazquez",
+                hints: [
+                    "Fue un pintor barroco español.",
+                    "Fue el artista principal en la corte del rey Felipe IV.",
+                    "Su nombre de pila es Diego."
+                ]
+            },
+            {
+                question: "¿Cuál es el elemento químico más pesado que se encuentra naturalmente en la Tierra?",
+                answer: "uranio",
+                hints: [
+                    "Es un elemento radiactivo.",
+                    "Se usa como combustible en reactores nucleares.",
+                    "Su símbolo químico es 'U'."
+                ]
+            },
+            {
+                question: "¿Quién fue el primer ser humano en viajar al espacio?",
+                answer: "yuri gagarin",
+                hints: [
+                    "Fue un cosmonauta soviético.",
+                    "Realizó su viaje espacial en 1961.",
+                    "Su nombre de pila es Yuri."
+                ]
+            },
+            {
+                question: "¿Cuál es la obra más famosa de Miguel Ángel en la Capilla Sixtina?",
+                answer: "la creacion de adan",
+                hints: [
+                    "Es parte del techo de la Capilla Sixtina.",
+                    "Muestra a Dios dando vida a Adán.",
+                    "Es una de las imágenes más reproducidas en la historia del arte."
+                ]
+            },
+            {
+                question: "¿Quién escribió 'El arte de la guerra'?",
+                answer: "sun tzu",
+                hints: [
+                    "Fue un general, estratega militar y filósofo de la antigua China.",
+                    "Su obra es considerada un clásico en estrategia militar.",
+                    "Su nombre significa 'Maestro Sun'."
+                ]
+            },
+            {
+                question: "¿Cuál es el desierto más grande del mundo?",
+                answer: "sahara",
+                hints: [
+                    "Se encuentra en el norte de África.",
+                    "Cubre una superficie de unos 9 millones de kilómetros cuadrados.",
+                    "Su nombre en árabe significa 'desierto'."
+                ]
+            },
+            {
+                question: "¿Quién compuso las Cuatro Estaciones?",
+                answer: "antonio vivaldi",
+                hints: [
+                    "Fue un compositor y violinista italiano del Barroco.",
+                    "Era conocido como 'El cura rojo' por su cabello pelirrojo.",
+                    "Su nombre de pila es Antonio."
+                ]
+            },
+            {
+                question: "¿Cuál es el país más poblado del mundo?",
+                answer: "india",
+                hints: [
+                    "Superó recientemente a China en población.",
+                    "Su capital es Nueva Delhi.",
+                    "Es famoso por el Taj Mahal."
+                ]
+            },
+            {
+                question: "¿Quién fue el primer emperador romano?",
+                answer: "augusto",
+                hints: [
+                    "Fue el sobrino y heredero de Julio César.",
+                    "Su nombre de nacimiento era Octavio.",
+                    "Gobernó desde el 27 a.C. hasta el 14 d.C."
+                ]
+            },
+            {
+                question: "¿Cuál es la velocidad de la luz?",
+                answer: "299792458",
+                hints: [
+                    "Se mide en metros por segundo.",
+                    "Es aproximadamente 300,000 kilómetros por segundo.",
+                    "Es una constante fundamental en física."
+                ]
+            }
+        ];
+
+        const congratulations = [
+            "¡Excelente trabajo! Eres un verdadero erudito.",
+            "¡Impresionante! Tu sabiduría no tiene límites.",
+            "¡Bravo! Has demostrado ser un maestro del conocimiento.",
+            "¡Fantástico! Tu intelecto es admirable."
+        ];
+
+        const insults = [
+            "¡Vaya! Parece que tu cerebro está de vacaciones.",
+            "¿En serio? Hasta mi abuela sabría eso.",
+            "Uff, ¿necesitas un mapa para encontrar la respuesta correcta?",
+            "¡Ay, nanita! ¿De verdad no lo sabes? ¡Échale más ganas!"
+        ];
+
+        let currentQuestion = 0;
+        let attempts = 0;
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question').textContent = q.question;
+            document.getElementById('hint').textContent = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('answer').value = '';
+            document.getElementById('progress').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answer').value.toLowerCase().trim();
+            const correctAnswer = questions[currentQuestion].answer;
+
+            if (userAnswer === correctAnswer) {
+                document.getElementById('result').textContent = congratulations[Math.floor(Math.random() * congratulations.length)];
+                currentQuestion++;
+                attempts = 0;
+                if (currentQuestion < questions.length) {
+                    setTimeout(loadQuestion, 2000);
+                } else {
+                    document.getElementById('question').textContent = "¡Felicidades! Has resuelto todos los misterios.";
+                    document.getElementById('answer').style.display = 'none';
+                    document.getElementById('submit').style.display = 'none';
+                }
+            } else {
+                attempts++;
+                if (attempts < 3) {
+                    document.getElementById('hint').textContent = `Pista: ${questions[currentQuestion].hints[attempts - 1]}`;
+                } else {
+                    document.getElementById('result').textContent = `${insults[Math.floor(Math.random() * insults.length)]} La respuesta correcta era: ${correctAnswer}`;
+                    currentQuestion++;
+                    attempts = 0;
+                    if (currentQuestion < questions.length) {
+                        setTimeout(loadQuestion, 3000);
+                    } else {
+                        document.getElementById('question').textContent = "El juego ha terminado. ¡Gracias por jugar!";
+                        document.getElementById('answer').style.display = 'none';
+                        document.getElementById('submit').style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        document.getElementById('submit').addEventListener('click', checkAnswer);
+        document.getElementById('answer').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        loadQuestion();
+    </script>
+</body>
+</html>
